@@ -8,7 +8,7 @@
 int main(void)
 {
 		int i = 1;
-			int b = 59;
+			int b = 0;
 
 write(i, "and that piece of art is useful\" - Dora Korpar, 2015-10-19", b);
 return (1);
