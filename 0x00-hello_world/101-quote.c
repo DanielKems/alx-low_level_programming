@@ -8,8 +8,8 @@
 int main(void)
 {
 		int i = 1;
-			int b = 0;
+			int b = 58;
 
-write(i, "and that piece of art is useful\" - Dora Korpar, 2015-10-19", b);
-return (1);
+			write(i,  "and that piece of art is useful\" - Dora Korpar, 2015-10-19", b);
+					return (1);
 }
