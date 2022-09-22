@@ -1,42 +1,25 @@
 #include "main.h"
+#include <stdio.h>
+
 /**
- * cap_string - capitalizes all words of a string.
- * @a: char to capitalizes
- * Return: char*
+ * *cap_string - this is awesome
+ * * @s: pointer to char params
+ *
+ * * Return: *s
  */
 
-char *cap_string(char *a)
+char *cap_string(char *s)
 {
-	int i = 0, j = 0;
+	int i, j;
+	char delimeters[] = " \t\n,;.!?\"(){}";
 
-	while (a[j])
-		j++;
-
-	if (j > 0)
+	for (i = 0; s[i] != '\0'; i++)
 	{
-		if (a[0] >= 97 && a[0] <= 122)
-			*(a + i + 1) = *(a + i + 1) - 32;
-		else
-			a[i + 1] = a[i + 1];
-
-		while (a[i])
-		{
-			if (a[i] == ',' || a[i] == ';' || a[i] == '.' ||
-					a[i] == '!' || a[i] == '?' || a[i] == '"' ||
-					a[i] == '(' || a[i] == ')' || a[i] == '{' ||
-					a[i] == '}' || a[i] == 32 || a[i] == 9 ||
-					a[i] == '\n')
-			{
-				if (a[i + 1] >= 97  && a[i + 1] <= 122)
-					*(a + i + 1) = *(a + i + 1) - 32;
-				else
-					a[i + 1] = a[i + 1];
-			}
-
-			i++;
-		}
+		if (s[0] >= 97 && s[0] <= 122)
+			s[0] = s[0] - 32;
+		for (j = 0; delimeters[j] != '\0'; j++)
+			if (s[i] == delimeters[j] && s[i + 1] >= 97 && s[i + 1] <= 122)
+				s[i + 1] = s[i + 1] - 32;
 	}
-
-	return (a);
+	return (s);
 }
-
