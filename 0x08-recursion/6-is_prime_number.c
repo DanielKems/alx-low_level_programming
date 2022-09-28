@@ -1,31 +1,33 @@
 #include "main.h"
-
 /**
- * prime_check - checks to see if number is prime
- * @f: factor check
- * @p: possible prime number
- *
- * Return: 1 if prime, 0 if not
+ * is_prime_number - function that returns 1 if the input
+ * integer is a prime number, otherwise return 0
+ * @n: number  to calculate the prime
+ * Return: 1 if the number is prime , 0 otherwise
  */
-int prime_check(int f, int p)
-{
-  if (p < 2 || p % f == 0)
-    return (0);
-  else if (f > p / 2)
-    return (1);
-  else
-    return (prime_check(f + 1, p));
-}
 
-/**
- * is_prime_number - states if number is prime
- * @n: number to check
- *
- * Return: 1 if prime, 0 if not
- */
 int is_prime_number(int n)
 {
-  if (n == 2)
-    return (1);
-  return (prime_check(2, n));
+	if (n <= 1)
+		return (0);
+	return (calculate_prime(n, 2));
+}
+/**
+ * calculate_prime - function that calculate the natural square root of
+ * a number
+ * @n: number to calculate prime
+ * @iterator: initial number to test sqrt
+ * Return: Value to sqrt
+ */
+int calculate_prime(int  n, int iterator)
+{
+	if (iterator < n)
+	{
+		if (n % iterator != 0)
+		{
+			calculate_prime(n, iterator + 1);
+		} else
+			return (0);
+	}
+	return (1);
 }
