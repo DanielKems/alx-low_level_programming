@@ -1,96 +1,124 @@
-include "lists.h"
-
-size_t looped_listint_count(listint_t *head);
-size_t free_listint_safe(listint_t **h);
+#include <stdlib.h>
+#include <stdio.h>
+#include <inttypes.h>
+#include "lists.h"
 
 /**
- * looped_listint_count - Counts the number of unique nodes
- *                      in a looped listint_t linked list.
- * @head: A pointer to the head of the listint_t to check.
+ * _realloc1 - Reallocates a memory block
+ * @ptr: The pointer to the previous memory block
+ * @old_size: The size of the old memory block
+ * @new_size: The size of the new memory block
  *
- * Return: If the list is not looped - 0.
- *         Otherwise - the number of unique nodes in the list.
+ * Return: The pointer to the new memory block otherwise NULL
  */
-size_t looped_listint_count(listint_t *head)
+void *_realloc1(void *ptr, unsigned int old_size, unsigned int new_size)
 {
-	listint_t *tortoise, *hare;
-	size_t nodes = 1;
+	void *new_ptr;
+	unsigned int min_size = old_size < new_size ? old_size : new_size;
+	unsigned int i;
 
-	if (head == NULL || head->next == NULL)
-		return (0);
-
-	tortoise = head->next;
-	hare = (head->next)->next;
-
-	while (hare)
+	if (new_size == old_size)
+		return (ptr);
+	if (ptr != NULL)
 	{
-		if (tortoise == hare)
+		if (new_size == 0)
 		{
-			tortoise = head;
-			while (tortoise != hare)
-			{
-				nodes++;
-				tortoise = tortoise->next;
-				hare = hare->next;
-			}
-
-			tortoise = tortoise->next;
-			while (tortoise != hare)
-			{
-				nodes++;
-				tortoise = tortoise->next;
-			}
-
-			return (nodes);
+			free(ptr);
+			return (NULL);
 		}
-
-		tortoise = tortoise->next;
-		hare = (hare->next)->next;
+		new_ptr = malloc(new_size);
+		if (new_ptr != NULL)
+		{
+			for (i = 0; i < min_size; i++)
+				*((char *)new_ptr + i) = *((char *)ptr + i);
+			free(ptr);
+			return (new_ptr);
+		}
+		free(ptr);
+		return (NULL);
 	}
+	else
+	{
+		new_ptr = malloc(new_size);
+		return (new_ptr);
+	}
+}
 
+/**
+ * exists1 - Checks if an item exists in the given array
+ * @arr: The array to look in
+ * @n: The lentgh of the array
+ * @item: The item to look for
+ *
+ * Return: 1 if it exists, otherwise, 0
+ */
+char exists1(void **arr, size_t n, void *item)
+{
+	size_t i;
+
+	for (i = 0; i < n; i++)
+	{
+		if (*(arr + i) == item)
+			return (1);
+	}
 	return (0);
 }
 
 /**
- * free_listint_safe - Frees a listint_t list safely (ie.
- *                     can free lists containing loops)
- * @h: A pointer to the address of
- *     the head of the listint_t list.
+ * free_nodes - Frees a list of nodes
+ * @nodes_ptr: An array of node addresses
+ * @n: The number of node addresses
+*/
+void free_nodes(void **nodes_ptr, size_t n)
+{
+	size_t i;
+	listint_t *node;
+
+	for (i = 0; i < n; i++)
+	{
+		node = (listint_t *)(*(nodes_ptr + i));
+		if (node != NULL)
+			free(node);
+	}
+}
+
+/**
+ * free_listint_safe - Frees a listint_t list
+ * @h: The node at the beginning of the list
  *
- * Return: The size of the list that was freed.
- *
- * Description: The function sets the head to NULL.
+ * Return: The size of the freed list
  */
 size_t free_listint_safe(listint_t **h)
 {
-	listint_t *tmp;
-	size_t nodes, index;
+	void **nodes_addr = NULL;
+	listint_t *node;
+	size_t i = 0, size = 0, incr = 15;
 
-	nodes = looped_listint_count(*h);
-
-	if (nodes == 0)
+	if (h != NULL && *h != NULL)
 	{
-		for (; h != NULL && *h != NULL; nodes++)
+		node = *h;
+		while (node != NULL)
 		{
-			tmp = (*h)->next;
-			free(*h);
-			*h = tmp;
+			if (i >= size)
+				nodes_addr = _realloc1(nodes_addr,
+															sizeof(void *) * size, sizeof(void *) * (size + incr));
+			if (nodes_addr != NULL)
+			{
+				size += (i >= size ? incr : 0);
+				if (exists1(nodes_addr, i, (void *)node))
+				{
+					break;
+				}
+				*(nodes_addr + i) = (void *)node;
+				i++;
+				node = node->next;
+			}
 		}
-	}
-
-	else
-	{
-		for (index = 0; index < nodes; index++)
-		{
-			tmp = (*h)->next;
-			free(*h);
-			*h = tmp;
-		}
-
+		free_nodes(nodes_addr, i);
 		*h = NULL;
+		if (nodes_addr != NULL)
+			free(nodes_addr);
 	}
-
 	h = NULL;
-
-	return (nodes);
+	return (i);
 }
